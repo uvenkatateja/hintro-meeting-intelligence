@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 
 describe('Action Items Integration Tests', () => {
   let authToken: string;
-  let userId: string;
   let meetingId: string;
 
   beforeAll(async () => {
@@ -23,7 +22,6 @@ describe('Action Items Integration Tests', () => {
       });
 
     authToken = registerResponse.body.data.token;
-    userId = registerResponse.body.data.user.id;
 
     const meetingResponse = await request(app)
       .post('/api/meetings')
