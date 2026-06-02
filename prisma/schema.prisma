@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  meetings  Meeting[]
+
+  @@map("users")
+}
+
+model Meeting {
+  id           String       @id @default(cuid())
+  title        String
+  participants String[]
+  meetingDate  DateTime
+  transcript   Json
+  analysis     Json?
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  actionItems  ActionItem[]
+
+  @@index([userId])
+  @@map("meetings")
+}
+
+enum ActionItemStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+model ActionItem {
+  id           String           @id @default(cuid())
+  task         String
+  assignee     String
+  dueDate      DateTime?
+  status       ActionItemStatus @default(PENDING)
+  meetingId    String
+  meeting      Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  citations    Json
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  reminderLogs ReminderLog[]
+
+  @@index([meetingId])
+  @@index([status])
+  @@map("action_items")
+}
+
+model ReminderLog {
+  id           String     @id @default(cuid())
+  actionItemId String
+  actionItem   ActionItem @relation(fields: [actionItemId], references: [id], onDelete: Cascade)
+  sentTo       String
+  sentAt       DateTime
+  channel      String
+  success      Boolean
+  errorMessage String?
+  createdAt    DateTime   @default(now())
+
+  @@index([actionItemId])
+  @@map("reminder_logs")
+}

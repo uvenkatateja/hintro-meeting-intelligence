@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: hintro_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: TypeScript compiler check
+        run: npx tsc --noEmit
+
+      - name: Run database migrations
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/hintro_test
+
+      - name: Run tests
+        run: npm test
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/hintro_test
+          JWT_SECRET: test-secret-key
+          JWT_EXPIRES_IN: 7d
+          GROQ_API_KEY: test-groq-key
+          RESEND_API_KEY: test-resend-key
+          RESEND_FROM_EMAIL: test@example.com
+          REDIS_URL: redis://localhost:6379
+          PORT: 3000
+          NODE_ENV: test
+          REMINDER_CRON: "0 * * * *"
