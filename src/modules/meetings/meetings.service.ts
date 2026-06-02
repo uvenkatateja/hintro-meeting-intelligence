@@ -50,7 +50,7 @@ export class MeetingsService {
     try {
       const cachePattern = `meetings:${userId}:*`;
       const keys = await redis.keys(cachePattern);
-      if (keys.length > 0) {
+      if (keys && Array.isArray(keys) && keys.length > 0) {
         await redis.del(...keys);
       }
     } catch (error) {
@@ -219,7 +219,7 @@ If no action items exist in the transcript, return empty array. Same for decisio
     try {
       const cachePattern = `meetings:${userId}:*`;
       const keys = await redis.keys(cachePattern);
-      if (keys.length > 0) {
+      if (keys && Array.isArray(keys) && keys.length > 0) {
         await redis.del(...keys);
       }
     } catch (error) {
@@ -231,3 +231,4 @@ If no action items exist in the transcript, return empty array. Same for decisio
 }
 
 export const meetingsService = new MeetingsService();
+

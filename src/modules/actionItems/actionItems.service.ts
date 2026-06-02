@@ -32,7 +32,7 @@ export class ActionItemsService {
     try {
       const cachePattern = `action-items:${userId}:*`;
       const keys = await redis.keys(cachePattern);
-      if (keys.length > 0) {
+      if (keys && Array.isArray(keys) && keys.length > 0) {
         await redis.del(...keys);
       }
     } catch (error) {
@@ -138,7 +138,7 @@ export class ActionItemsService {
     try {
       const cachePattern = `action-items:${userId}:*`;
       const keys = await redis.keys(cachePattern);
-      if (keys.length > 0) {
+      if (keys && Array.isArray(keys) && keys.length > 0) {
         await redis.del(...keys);
       }
     } catch (error) {
@@ -150,3 +150,4 @@ export class ActionItemsService {
 }
 
 export const actionItemsService = new ActionItemsService();
+
