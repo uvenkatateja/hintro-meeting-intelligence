@@ -14,12 +14,12 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: `http://localhost:${env.PORT}`,
-        description: 'Development server',
+        url: 'https://hintro-meeting-intelligence.up.railway.app',
+        description: 'Production server',
       },
       {
-        url: 'https://your-railway-url.up.railway.app',
-        description: 'Production server',
+        url: `http://localhost:${env.PORT}`,
+        description: 'Development server',
       },
     ],
     components: {
