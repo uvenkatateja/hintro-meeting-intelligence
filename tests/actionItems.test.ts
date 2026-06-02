@@ -111,6 +111,9 @@ describe('Action Items Integration Tests', () => {
       const pastDate = new Date();
       pastDate.setDate(pastDate.getDate() - 5);
 
+      const futureDate = new Date();
+      futureDate.setFullYear(futureDate.getFullYear() + 1);
+
       await request(app)
         .post('/api/action-items')
         .set('Authorization', `Bearer ${authToken}`)
@@ -127,7 +130,7 @@ describe('Action Items Integration Tests', () => {
         .send({
           task: 'Future Task',
           assignee: 'Jane Doe',
-          dueDate: '2025-12-31T23:59:59Z',
+          dueDate: futureDate.toISOString(),
           meetingId,
         });
 
